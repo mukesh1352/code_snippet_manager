@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-
+import { useState } from 'react'; 
 export default function Login() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');

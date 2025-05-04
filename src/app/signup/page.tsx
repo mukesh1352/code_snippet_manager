@@ -1,5 +1,7 @@
 'use client';
 
+// TODO => Need to implement the signup security policies
+// TODO =>Need to improve the ui for the login and the signup
 import { useState } from 'react';
 
 export default function Signup() {
