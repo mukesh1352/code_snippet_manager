@@ -18,6 +18,10 @@ const Header = () => {
       >
         Sign Up
       </Button>
+      <Button variant="default" onClick={()=>router.push('/login')}
+      className="bg-white text-gray-800 hover:bg-gray-200">
+        Login
+      </Button>
     </header>
   );
 };
