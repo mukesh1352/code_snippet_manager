@@ -6,16 +6,57 @@ import { Input } from '@/app/components/ui/input';
 import { Button } from '../components/ui/button';
 import { Label } from '@/app/components/ui/label';
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { z } from "zod";
+
+// Define validation schemas
+const usernameSchema = z.string()
+  .min(3, "Username must be at least 3 characters")
+  .max(20, "Username must be at most 20 characters");
+
+const passwordSchema = z.string()
+  .min(8, "Password must be at least 8 characters")
+  .max(32, "Password must be at most 32 characters")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character");
 
 export default function Signup() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  const validateForm = () => {
+    try {
+      usernameSchema.parse(name);
+      passwordSchema.parse(password);
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach(err => {
+          if (err.path[0]) {
+            newErrors[err.path[0]] = err.message;
+          }
+        });
+        setErrors(newErrors);
+      }
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      setMessage('Please fix the errors in the form');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -28,17 +69,16 @@ export default function Signup() {
       const data = await res.json();
       
       if (res.ok) {
-        setMessage(data.message || 'Signup successful!');
-        // Redirect to login page after 2 seconds
+        setMessage(data.message || 'Signup successful! Redirecting to login...');
         setTimeout(() => {
           router.push('/login');
         }, 2000);
       } else {
-        setMessage(data.error || 'Signup failed');
+        setMessage(data.error || 'Signup failed. Please try again.');
       }
     } catch (err) {
       setMessage('An error occurred. Please try again.');
-      console.error('Signup error:', err); // Now using the error variable
+      console.error('Signup error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -62,11 +102,17 @@ export default function Signup() {
               id="username"
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (errors.username) validateForm();
+              }}
               required
               placeholder="Enter your username"
-              className="py-2 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              className={`py-2 px-4 border ${errors.username ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all`}
             />
+            {errors.username && (
+              <p className="text-sm text-red-500 mt-1">{errors.username}</p>
+            )}
           </div>
           
           <div className="space-y-2">
@@ -78,11 +124,17 @@ export default function Signup() {
               id="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password) validateForm();
+              }}
               required
               placeholder="Enter your password"
-              className="py-2 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              className={`py-2 px-4 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all`}
             />
+            {errors.password && (
+              <p className="text-sm text-red-500 mt-1">{errors.password}</p>
+            )}
           </div>
           
           <Button 
