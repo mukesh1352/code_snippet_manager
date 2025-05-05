@@ -8,21 +8,21 @@ import { Label } from '@/app/components/ui/label';
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { z } from "zod";
 
-// Define validation schemas
+// Validation Schemas
 const usernameSchema = z.string()
   .min(3, "Username must be at least 3 characters")
   .max(20, "Username must be at most 20 characters");
 
 const passwordSchema = z.string()
-  .min(8, "Password must be at least 8 characters")
+  .min(1, "Password must be at least 8 characters")
   .max(32, "Password must be at most 32 characters")
-  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-  .regex(/[0-9]/, "Password must contain at least one number")
-  .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character");
+  .regex(/[a-z]/, "Must contain at least one lowercase letter")
+  .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Must contain at least one number")
+  .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character");
 
 export default function Signup() {
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -31,7 +31,7 @@ export default function Signup() {
 
   const validateForm = () => {
     try {
-      usernameSchema.parse(name);
+      usernameSchema.parse(username);
       passwordSchema.parse(password);
       setErrors({});
       return true;
@@ -63,13 +63,13 @@ export default function Signup() {
       const res = await fetch('/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await res.json();
       
       if (res.ok) {
-        setMessage(data.message || 'Signup successful! Redirecting to login...');
+        setMessage(data.message || 'Signup successful! Redirecting...');
         setTimeout(() => {
           router.push('/login');
         }, 2000);
@@ -101,9 +101,9 @@ export default function Signup() {
             <Input
               id="username"
               type="text"
-              value={name}
+              value={username}
               onChange={(e) => {
-                setName(e.target.value);
+                setUsername(e.target.value);
                 if (errors.username) validateForm();
               }}
               required
