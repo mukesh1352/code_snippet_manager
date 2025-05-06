@@ -24,15 +24,10 @@ export default function Login() {
       });
 
       const data = await res.json();
-      
+
       if (res.ok) {
-        setMessage('Login successful! Redirecting...');
-        // Store token if available
-        if (data.token) {
-          localStorage.setItem('authToken', data.token);
-        }
-        // Redirect to dashboard or home page
-        setTimeout(() => router.push('/dashboard'), 1500);
+        setMessage(data.message || 'Login successful! Redirecting...');
+        setTimeout(() => router.push('/'), 1500);
       } else {
         setMessage(data.error || 'Invalid credentials');
       }
@@ -51,7 +46,7 @@ export default function Login() {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
           <p className="text-gray-500">Sign in to your account</p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">
@@ -72,7 +67,7 @@ export default function Login() {
               />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
@@ -93,26 +88,6 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                Remember me
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a href="/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Forgot password?
-              </a>
-            </div>
-          </div>
-          
           <button
             type="submit"
             disabled={isLoading}
