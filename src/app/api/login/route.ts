@@ -28,7 +28,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Incorrect password' }, { status: 401 });
     }
 
-    // Create session
     const sessionId = randomUUID();
     await redis.set(`session:${sessionId}`, JSON.stringify({ username: name }), 'EX', 60 * 60 * 24); // 1 day
 
